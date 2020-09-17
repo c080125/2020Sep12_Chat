@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatアプリ</title>
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- コンテンツ表示画面 -->
+<div id="wrap">
+    <div id="header">
+        <div>ロゴ</div>
+        <div>サインイン</div>
+    </div>
+    <main id="main">
+        <table id="input">
+            <tr><th>From:</th><td><input type="text" id="uname"></td></tr>
+            <tr><th>To:</th><td> <input type="text" id="tname"></td></tr>
+            <tr><th>Feedback:</th><td><textarea id="text" cols="30" rows="10"></textarea></td></tr>
+        </table>
+        <!-- <div class="icons">
+            <div class="imgs" data-img="0"><img class="img" src="imgs/buke.png" alt=""></div>
+            <div class="imgs" data-img="1"><img  class="img" src="imgs/caram.png" alt=""></div>
+            <div class="imgs" data-img="2"><img  class="img" src="imgs/tuku.jpg" alt=""></div>
+        </div> -->
+        <div class="btn">
+            <button id="send">送信</button>
+            <!-- <button id="random">乱数発生</button>     -->
+        </div>
+        <div id="opbox" style="height:350px; overflow:auto; 
+        margin-bottom:30px; border:1px solid #cccccc">
+            <p id="output">
+            </p>
+        </div>
+        <footer id="footer">
+            <p>copyrights 2020 ひまえだ All Rights Reserved.</p>
+        </footer>
+    </main>
+</div>
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!--** 以下Firebase **-->
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.20.0/firebase.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = { // firebaseの変数
+    apiKey: "AIzaSyDeoAZL6hoXiRgQmFXUjhU2j3QxzIVBgcc", //ユニークな番号が付与される
+    authDomain: "dev17-e5901.firebaseapp.com", //ユニークな番号が付与される
+    databaseURL: "https://dev17-e5901.firebaseio.com",
+    projectId: "dev17-e5901",
+    storageBucket: "dev17-e5901.appspot.com",
+    messagingSenderId: "793608169362",
+    appId: "1:793608169362:web:dc55e2f6fb290eecb6434b"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const ref = firebase.database().ref(); 
+
+function send(){
+    let now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth()+1;
+    let date = now.getDate();
+    let hour = now.getHours();
+    let min = now.getMinutes();
+    let sec = now.getSeconds();
+
+    const time = year+"/"+month+"/"+date+"   "+hour+":"+min+":"+sec;
+    const uname = $("#uname").val();
+    const tname = $("#tname").val();
+    const text  = $("#text").val();
+    const msg   = {
+        uname:uname, //左側がキー名、右側が変数
+        tname:tname,
+        text:text,
+        time:time,
+    }; // object変数の入れ物
+    ref.push(msg);   
+}
+
+  $("#send").on("click",function(){
+    send();
+    $("#uname").val("");
+    $("#tname").val("");
+    $("#text").val("");
+  });
+
+// function random(){
+//     let now = new Date();
+//     let year = now.getFullYear();
+//     let month = now.getMonth()+1;
+//     let date = now.getDate();
+//     let hour = now.getHours();
+//     let min = now.getMinutes();
+//     let sec = now.getSeconds();
+//     const time = year+"/"+month+"/"+date+"   "+hour+":"+min+":"+sec;
+//     const uname = "魚住純";
+//     const tname = "赤木剛憲";
+//     const text  = "お前に華麗なんて言葉が似合うと思うか赤木。お前は鰈だ。泥にまみれろよ";
+//     const msg   = {
+//         uname:uname,
+//         tname:tname,
+//         text:text,
+//         time:time
+//     };
+//     console.log (msg);
+//     ref.push(msg);
+// }
+// $("#random").on("click",function(){
+//     random();
+//     $("#opbox").scrollTop($("#opbox")[0].scrollHeight);
+//     });
+
+// 受信処理
+ref.on("child_added",function(data){
+    const v =   data.val(); 
+    const k =   data.key; 
+    const h =   '<p id="output">'+v.time+'<br>'+v.tname+'<br>'+v.text+'<br>'+v.uname+'</p>';
+    $("#opbox").append(h);
+});
+
+ref.on("child_added",function(){
+    const h =   '<p id="response">2020/09/15</p>';
+    $("#opbox").append(h);
+    $("#main").scrollTop($("#main")[0].scrollHeight);
+    $("#opbox").scrollTop($("#opbox")[0].scrollHeight);
+    // $("#opbox").scrollTop($("#opbox")[0].scrollHeight);
+    // $("#response").append(h);
+    // 「,」は次がある、「.」は「〜の」
+});
+
+// イベント情報取得
+$("#text").on("keydown",function(e){ //eはただの変数名、eventのe
+    console.log(e);
+    if(e.keyCode == 13){
+        send();
+    };
+});
+
+// お疲れっていう機能
+// 安西先生に、「諦めたらそこで試合終了ですよ」って行ってもらうボット
+// http://www.shurey.com/js/samples/1_tips10.html
+// ↑window.innerHeightを取得して、入力フォームと表示フォームの高さを可変にする。
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
